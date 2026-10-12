@@ -303,11 +303,22 @@ function App() {
 
     } catch (error) {
 
-      console.error(error);
+      console.error("Registration error:", error);
 
-      setAuthErrors({
-        email: "Email may already be registered"
-      });
+      if (error.response?.status === 409) {
+        setAuthErrors({
+          email: "This email is already registered. Please log in."
+        });
+      } else if (!error.response) {
+        setAuthErrors({
+          email: "Cannot connect to the server. Please try again later."
+        });
+      } else {
+        setAuthErrors({
+          email: error.response?.data?.message ||
+            `Registration failed (HTTP ${error.response.status}). Please try again.`
+        });
+      }
     }
   };
 
@@ -362,12 +373,18 @@ function App() {
 
     } catch (error) {
 
-      console.error(error);
+      console.error("Login error:", error);
 
-      setAuthErrors({
-        password:
-          "Invalid email or password"
-      });
+      if (!error.response) {
+        setAuthErrors({
+          password: "Cannot connect to the server. Please try again later."
+        });
+      } else {
+        setAuthErrors({
+          password: error.response?.data?.message ||
+            "Login failed. Please check your email and password."
+        });
+      }
     }
   };
 
